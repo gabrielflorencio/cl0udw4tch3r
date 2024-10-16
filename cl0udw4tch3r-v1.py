@@ -258,15 +258,15 @@ def get_eks_container_count(region, session, debug=False):
     """Get the count of EKS container hosts"""
     client = session.client('eks', region_name=region)
     clusters = client.list_clusters()['clusters']
-    container_count = 0
+    eks_node_count = 0
     for cluster in clusters:
         ec2_client = session.client('ec2', region_name=region)
         paginator = ec2_client.get_paginator('describe_instances')
-        for page in paginator.paginate(Filters=[{'Name': 'tag:eks:cluster-name', 'Values': [cluster]}]):
+        for page in paginator.paginate(Filters=[{'Name': 'tag:kubernetes.io/cluster/' + cluster, 'Values': ['owned']}]):
             for reservation in page['Reservations']:
-                container_count += len(reservation.get('Instances', []))
-    debug_log(f"EKS container count for {region}: {container_count}", debug)
-    return container_count
+                eks_node_count += len(reservation.get('Instances', []))
+                debug_log(f"EKS node found in cluster {cluster}", debug)
+    return eks_node_count
 
 # Function to get Lambda function count for the region
 def get_lambda_function_count(region, session, debug=False):

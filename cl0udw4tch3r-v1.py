@@ -346,7 +346,10 @@ def get_workloads(account_name, account_id, regions, session, csv_file=None, txt
         'SageMakerDomains': 0
     }
 
+    # Loop through each region
     for region in regions:
+        debug_log(f"Scanning region {region}", debug)
+        
         ec2_count = get_ec2_instance_count(region, session, debug)
         lightsail_count = get_lightsail_instance_count(region, session, debug)
         ecs_count = get_ecs_container_count(region, session, debug)
@@ -356,6 +359,10 @@ def get_workloads(account_name, account_id, regions, session, csv_file=None, txt
         sagemaker_endpoints_count = get_sagemaker_count(region, session, debug)
         sagemaker_domains_count = get_sagemaker_domains_count(region, session, debug)
 
+        # Sum up SageMaker endpoints and domains
+        total_sagemaker_count = sagemaker_endpoints_count + sagemaker_domains_count
+
+        # Accumulate actual resource counts
         actual_resources['EC2'] += ec2_count
         actual_resources['LightSail'] += lightsail_count
         actual_resources['ECS'] += ecs_count
@@ -365,47 +372,47 @@ def get_workloads(account_name, account_id, regions, session, csv_file=None, txt
         actual_resources['SageMakerEndpoints'] += sagemaker_endpoints_count
         actual_resources['SageMakerDomains'] += sagemaker_domains_count
 
-        total_sagemaker_count = sagemaker_endpoints_count + sagemaker_domains_count
+        # Accumulate workloads
         total_workloads['EC2Workload'] += ec2_count * WORKLOAD_RATIOS['EC2']
         total_workloads['LightSailWorkload'] += lightsail_count * WORKLOAD_RATIOS['LightSail']
         total_workloads['ECSWorkload'] += ecs_count * WORKLOAD_RATIOS['ECS']
         total_workloads['EKSWorkload'] += eks_count * WORKLOAD_RATIOS['EKS']
-        # Adjust total workloads calculation by rounding the result
-        total_workloads['FargateWorkload'] = round(fargate_count * WORKLOAD_RATIOS['Fargate'], 2)
-        total_workloads['LambdaWorkload'] = round(lambda_count * WORKLOAD_RATIOS['Lambda'], 2)
-        total_workloads['SageMakerWorkload'] = round(total_sagemaker_count * WORKLOAD_RATIOS['SageMaker'], 2)
+        total_workloads['LambdaWorkload'] += round(lambda_count * WORKLOAD_RATIOS['Lambda'], 2)
+        total_workloads['FargateWorkload'] += round(fargate_count * WORKLOAD_RATIOS['Fargate'], 2)
+        total_workloads['SageMakerWorkload'] += round(total_sagemaker_count * WORKLOAD_RATIOS['SageMaker'], 2)
 
+        # Logging workloads to CSV and TXT
         if csv_file:
             if ec2_count > 0:
-                log_to_csv(csv_file, account_name, account_id, region, "EC2", ec2_count, ec2_count * WORKLOAD_RATIOS['EC2'], debug)
+                log_to_csv(csv_file, account_name, account_id, region, "EC2", ec2_count, total_workloads['EC2Workload'], debug)
             if lightsail_count > 0:
-                log_to_csv(csv_file, account_name, account_id, region, "LightSail", lightsail_count, lightsail_count * WORKLOAD_RATIOS['LightSail'], debug)
+                log_to_csv(csv_file, account_name, account_id, region, "LightSail", lightsail_count, total_workloads['LightSailWorkload'], debug)
             if ecs_count > 0:
-                log_to_csv(csv_file, account_name, account_id, region, "ECS", ecs_count, ecs_count * WORKLOAD_RATIOS['ECS'], debug)
+                log_to_csv(csv_file, account_name, account_id, region, "ECS", ecs_count, total_workloads['ECSWorkload'], debug)
             if eks_count > 0:
-                log_to_csv(csv_file, account_name, account_id, region, "EKS", eks_count, eks_count * WORKLOAD_RATIOS['EKS'], debug)
-            if fargate_count > 0:
-                log_to_csv(csv_file, account_name, account_id, region, "Fargate", fargate_count, round(total_workloads['FargateWorkload'], 2), debug)
-            if total_sagemaker_count > 0:
-                log_to_csv(csv_file, account_name, account_id, region, "SageMaker", total_sagemaker_count, round(total_workloads['SageMakerWorkload'], 2), debug)
+                log_to_csv(csv_file, account_name, account_id, region, "EKS", eks_count, total_workloads['EKSWorkload'], debug)
             if lambda_count > 0:
-                log_to_csv(csv_file, account_name, account_id, region, "Lambda", lambda_count, round(total_workloads['LambdaWorkload'], 2), debug)
+                log_to_csv(csv_file, account_name, account_id, region, "Lambda", lambda_count, total_workloads['LambdaWorkload'], debug)
+            if fargate_count > 0:
+                log_to_csv(csv_file, account_name, account_id, region, "Fargate", fargate_count, total_workloads['FargateWorkload'], debug)
+            if total_sagemaker_count > 0:
+                log_to_csv(csv_file, account_name, account_id, region, "SageMaker", total_sagemaker_count, total_workloads['SageMakerWorkload'], debug)
 
         if txt_file:
             if ec2_count > 0:
-                log_to_txt(txt_file, account_name, account_id, region, "EC2", ec2_count, ec2_count * WORKLOAD_RATIOS['EC2'], debug)
+                log_to_txt(txt_file, account_name, account_id, region, "EC2", ec2_count, total_workloads['EC2Workload'], debug)
             if lightsail_count > 0:
-                log_to_txt(txt_file, account_name, account_id, region, "LightSail", lightsail_count, lightsail_count * WORKLOAD_RATIOS['LightSail'], debug)
+                log_to_txt(txt_file, account_name, account_id, region, "LightSail", lightsail_count, total_workloads['LightSailWorkload'], debug)
             if ecs_count > 0:
-                log_to_txt(txt_file, account_name, account_id, region, "ECS", ecs_count, ecs_count * WORKLOAD_RATIOS['ECS'], debug)
+                log_to_txt(txt_file, account_name, account_id, region, "ECS", ecs_count, total_workloads['ECSWorkload'], debug)
             if eks_count > 0:
-                log_to_txt(txt_file, account_name, account_id, region, "EKS", eks_count, eks_count * WORKLOAD_RATIOS['EKS'], debug)
-            if fargate_count > 0:
-                log_to_txt(txt_file, account_name, account_id, region, "Fargate", fargate_count, round(total_workloads['FargateWorkload'], 2), debug)
-            if total_sagemaker_count > 0:
-                log_to_txt(txt_file, account_name, account_id, region, "SageMaker", total_sagemaker_count, round(total_workloads['SageMakerWorkload'], 2), debug)
+                log_to_txt(txt_file, account_name, account_id, region, "EKS", eks_count, total_workloads['EKSWorkload'], debug)
             if lambda_count > 0:
-                log_to_txt(txt_file, account_name, account_id, region, "Lambda", lambda_count, round(total_workloads['LambdaWorkload'], 2), debug)
+                log_to_txt(txt_file, account_name, account_id, region, "Lambda", lambda_count, total_workloads['LambdaWorkload'], debug)
+            if fargate_count > 0:
+                log_to_txt(txt_file, account_name, account_id, region, "Fargate", fargate_count, total_workloads['FargateWorkload'], debug)
+            if total_sagemaker_count > 0:
+                log_to_txt(txt_file, account_name, account_id, region, "SageMaker", total_sagemaker_count, total_workloads['SageMakerWorkload'], debug)
 
         if progress_bar:
             progress_bar.update(1)

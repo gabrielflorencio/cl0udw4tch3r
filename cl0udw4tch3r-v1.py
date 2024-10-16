@@ -542,4 +542,4 @@ else:
         sys.exit(1)
 
 # Ensure that `cw_account`, `cw_region`, and `cw_name` are defined before passing them to `main`
-main(cw_account=cw_account, cw_region=cw_region, role_name=args.role_name, accounts=accounts, csv_file=csv_file, txt_file=txt_file, dashboard_name=cw_name, specified_regions=specified_regions, create_cw=args.cw, debug=args.debug)
+main(cw_account=cw_account, cw_region=cw_region, role_name=args.role_name, accounts=accounts, csv_file=csv_file, txt_file=txt_file, dashboard_name=cw_name, specified_regions=specified_regions, create_cw=create_cw, debug=args.debug)

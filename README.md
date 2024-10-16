@@ -122,6 +122,7 @@ python3 cl0udw4tch3r-v1.py --cw --cw_account CW_ACCOUNT_ID --cw_region us-west-2
 --cw_name: Custom name for the CloudWatch dashboard (default: WorkloadEvaluationDashboard).
 --debug: Enable debug logging for troubleshooting.
 ```
+
 ### Example Use Cases
 
 1. **Evaluating All AWS Accounts in an Organization**:
@@ -131,7 +132,7 @@ python3 cl0udw4tch3r-v1.py --cw --cw_account CW_ACCOUNT_ID --cw_region us-west-2
 2. **Running Workload Evaluation on Specific Accounts and Creating a CloudWatch Dashboard**:
     ```bash
     python3 cl0udw4tch3r-v1.py --accounts 123456789001,123456789002 --cw --cw_account 123456789001 --cw_region us-west-2
-```
+
 ### Contributing
 We welcome contributions! Please create an issue or submit a pull request if you would like to contribute.
 

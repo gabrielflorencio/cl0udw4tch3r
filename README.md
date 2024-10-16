@@ -23,8 +23,8 @@ It calculates workloads for EC2, Lambda, Fargate, ECS, EKS, SageMaker, and Light
 Clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/gabrielflorencio/aws-community.git
-cd aws-community
+git clone https://github.com/gabrielflorencio/cl0udw4tch3r.git
+cd cl0udw4tch3r
 pip install -r requirements.txt
 ```
 

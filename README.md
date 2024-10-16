@@ -52,6 +52,8 @@ Make sure the **OrganizationAccountAccessRole** role is trusted by the managemen
                 "lightsail:GetInstances",
                 "ecs:ListClusters",
                 "ecs:ListContainerInstances",
+                "ecs:ListTasks",
+                "ecs:DescribeTasks",
                 "ecs:DescribeContainerInstances",
                 "eks:ListClusters",
                 "eks:DescribeCluster",

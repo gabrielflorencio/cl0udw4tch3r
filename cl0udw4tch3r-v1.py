@@ -512,7 +512,7 @@ if __name__ == "__main__":
 
     # Interactive mode if --prompt flag is used
 if args.prompt:
-    # Prompt mode logic
+    # Interactive mode
     accounts, specified_regions, role_name, csv_file, txt_file, create_cw, cw_account, cw_name, cw_region = prompt_user_inputs(args.debug)
     if not create_cw:
         cw_account = cw_name = cw_region = None
@@ -522,8 +522,9 @@ else:
     csv_file = args.csv_name if args.csv else None
     txt_file = args.txt_name if args.txt else None
 
-    # Handle CloudWatch arguments
-    if args.cw:
+    # Handle CloudWatch arguments and ensure that create_cw is explicitly set
+    create_cw = args.cw
+    if create_cw:
         cw_account = args.cw_account
         cw_region = args.cw_region
         cw_name = args.cw_name

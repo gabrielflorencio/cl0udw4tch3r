@@ -370,9 +370,10 @@ def get_workloads(account_name, account_id, regions, session, csv_file=None, txt
         total_workloads['LightSailWorkload'] += lightsail_count * WORKLOAD_RATIOS['LightSail']
         total_workloads['ECSWorkload'] += ecs_count * WORKLOAD_RATIOS['ECS']
         total_workloads['EKSWorkload'] += eks_count * WORKLOAD_RATIOS['EKS']
-        total_workloads['LambdaWorkload'] += lambda_count * WORKLOAD_RATIOS['Lambda']
-        total_workloads['FargateWorkload'] += fargate_count * WORKLOAD_RATIOS['Fargate']
-        total_workloads['SageMakerWorkload'] += total_sagemaker_count * WORKLOAD_RATIOS['SageMaker']
+        # Adjust total workloads calculation by rounding the result
+        total_workloads['FargateWorkload'] = round(fargate_count * WORKLOAD_RATIOS['Fargate'], 2)
+        total_workloads['LambdaWorkload'] = round(lambda_count * WORKLOAD_RATIOS['Lambda'], 2)
+        total_workloads['SageMakerWorkload'] = round(total_sagemaker_count * WORKLOAD_RATIOS['SageMaker'], 2)
 
         if csv_file:
             if ec2_count > 0:
@@ -383,12 +384,12 @@ def get_workloads(account_name, account_id, regions, session, csv_file=None, txt
                 log_to_csv(csv_file, account_name, account_id, region, "ECS", ecs_count, ecs_count * WORKLOAD_RATIOS['ECS'], debug)
             if eks_count > 0:
                 log_to_csv(csv_file, account_name, account_id, region, "EKS", eks_count, eks_count * WORKLOAD_RATIOS['EKS'], debug)
-            if lambda_count > 0:
-                log_to_csv(csv_file, account_name, account_id, region, "Lambda", lambda_count, lambda_count * WORKLOAD_RATIOS['Lambda'], debug)
             if fargate_count > 0:
-                log_to_csv(csv_file, account_name, account_id, region, "Fargate", fargate_count, fargate_count * WORKLOAD_RATIOS['Fargate'], debug)
+                log_to_csv(csv_file, account_name, account_id, region, "Fargate", fargate_count, round(total_workloads['FargateWorkload'], 2), debug)
             if total_sagemaker_count > 0:
-                log_to_csv(csv_file, account_name, account_id, region, "SageMaker", total_sagemaker_count, total_sagemaker_count * WORKLOAD_RATIOS['SageMaker'], debug)
+                log_to_csv(csv_file, account_name, account_id, region, "SageMaker", total_sagemaker_count, round(total_workloads['SageMakerWorkload'], 2), debug)
+            if lambda_count > 0:
+                log_to_csv(csv_file, account_name, account_id, region, "Lambda", lambda_count, round(total_workloads['LambdaWorkload'], 2), debug)
 
         if txt_file:
             if ec2_count > 0:
@@ -399,12 +400,12 @@ def get_workloads(account_name, account_id, regions, session, csv_file=None, txt
                 log_to_txt(txt_file, account_name, account_id, region, "ECS", ecs_count, ecs_count * WORKLOAD_RATIOS['ECS'], debug)
             if eks_count > 0:
                 log_to_txt(txt_file, account_name, account_id, region, "EKS", eks_count, eks_count * WORKLOAD_RATIOS['EKS'], debug)
-            if lambda_count > 0:
-                log_to_txt(txt_file, account_name, account_id, region, "Lambda", lambda_count, lambda_count * WORKLOAD_RATIOS['Lambda'], debug)
             if fargate_count > 0:
-                log_to_txt(txt_file, account_name, account_id, region, "Fargate", fargate_count, fargate_count * WORKLOAD_RATIOS['Fargate'], debug)
+                log_to_txt(txt_file, account_name, account_id, region, "Fargate", fargate_count, round(total_workloads['FargateWorkload'], 2), debug)
             if total_sagemaker_count > 0:
-                log_to_txt(txt_file, account_name, account_id, region, "SageMaker", total_sagemaker_count, total_sagemaker_count * WORKLOAD_RATIOS['SageMaker'], debug)
+                log_to_txt(txt_file, account_name, account_id, region, "SageMaker", total_sagemaker_count, round(total_workloads['SageMakerWorkload'], 2), debug)
+            if lambda_count > 0:
+                log_to_txt(txt_file, account_name, account_id, region, "Lambda", lambda_count, round(total_workloads['LambdaWorkload'], 2), debug)
 
         if progress_bar:
             progress_bar.update(1)
